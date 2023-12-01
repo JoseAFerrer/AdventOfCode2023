@@ -1,13 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-Console.WriteLine("Hello, World!");
-
-var path = "input.txt";
+﻿var path = "input.txt";
 
 var readText = File.ReadAllLines(path);
+var totalSum = 0;
 foreach (var s in readText)
 {
-    Console.WriteLine(s);
+    var onlyNumbers = s.Where(char.IsNumber).Select(x => x.ToString());
+    var firstLast = onlyNumbers.First() + onlyNumbers.Last();
+    var refinedNumber = int.Parse(firstLast);
+    totalSum += refinedNumber;
 }
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("The total sum is " + totalSum);
