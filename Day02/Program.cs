@@ -9,11 +9,16 @@ var pathToExample = "Inputs/example1.txt";
 var pathToInput = "Inputs/input.txt";
 
 var exampleSumOfValidIds = FindSumOfValidIdsForFile(pathToExample, redMax, greenMax, blueMax);
-var sumOfValidIds = FindSumOfValidIdsForFile(pathToInput, redMax, greenMax, blueMax);
-
+var realSumOfValidIds = FindSumOfValidIdsForFile(pathToInput, redMax, greenMax, blueMax);
 
 Console.WriteLine("The example sum of valid ids is: " + exampleSumOfValidIds);
-Console.WriteLine("The real sum of valid ids is: " + sumOfValidIds);
+Console.WriteLine("The real sum of valid ids is: " + realSumOfValidIds);
+
+var exampleSumOfPowers = FindPowerOfSetsForFile(pathToExample);
+var realSumOfPowers = FindPowerOfSetsForFile(pathToInput);
+
+Console.WriteLine("The example sum of powers is: " + exampleSumOfPowers);
+Console.WriteLine("The real sum of powers is: " + realSumOfPowers);
 
 //
 //
@@ -25,16 +30,13 @@ int FindSumOfValidIdsForFile(string pathToInput1, int redMax1, int greenMax1, in
     var games = lines.Select(line =>
     {
         var x = line.Replace(" ", "");
-        var id = GetGameIdFromLine(x);
 
-        var handfulsLine = x.Split(":")[1];
-        var handfuls = handfulsLine.Split(";");
-        var handfulsSets = handfuls.SelectMany(y => y.Split(","));
-        var areColorsValid = new ColorValidator(handfulsSets, redMax1, greenMax1, blueMax1).AreColorsValid;
+        var handfulSets = FilterOutChars(x);
+        var areColorsValid = new ColorValidator(handfulSets, redMax1, greenMax1, blueMax1).AreColorsValid;
 
-        return new Game()
+        return new Game
         {
-            Id = id,
+            Id = GetGameIdFromLine(x),
             IsValid = areColorsValid
         };
     });
@@ -46,11 +48,45 @@ int FindSumOfValidIdsForFile(string pathToInput1, int redMax1, int greenMax1, in
     }
 
     return sumOfValidIds1;
+}
 
-    int GetGameIdFromLine(string s)
+int FindPowerOfSetsForFile(string pathToInput1)
+{
+    var lines = File.ReadAllLines(pathToInput1);
+    var games = lines.Select(line =>
     {
-        var gameWithId = s.Split(":")[0];
-        var i = int.Parse(gameWithId.Replace("Game", ""));
-        return i;
+        var x = line.Replace(" ", "");
+
+        var handfulSets = FilterOutChars(x);
+        var minColorFinder = new MinColorFinder(handfulSets);
+
+        return new Game
+        {
+            Id = GetGameIdFromLine(x),
+            Power = minColorFinder.MinRed * minColorFinder.MinGreen * minColorFinder.MinBlue
+        };
+    });
+
+    var sumOfPowers = 0;
+    foreach (var game in games)
+    {
+        sumOfPowers += game.Power;
     }
+
+    return sumOfPowers;
+}
+
+int GetGameIdFromLine(string s)
+{
+    var gameWithId = s.Split(":")[0];
+    var i = int.Parse(gameWithId.Replace("Game", ""));
+    return i;
+}
+
+IEnumerable<string> FilterOutChars(string s)
+{
+    var handfulsLine = s.Split(":")[1];
+    var handfuls = handfulsLine.Split(";");
+    var enumerable = handfuls.SelectMany(y => y.Split(","));
+    return enumerable;
 }
