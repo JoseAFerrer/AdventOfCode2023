@@ -14,5 +14,5 @@ Console.WriteLine("The sum of the part numbers in the real schematic is " + sumO
 var productOfGearsExample = Part2Solver.FindGearsAndMultiplyThem(parsedDemoInput);
 Console.WriteLine("The product of the part numbers for gears in the example is " + productOfGearsExample);
 
-var productOfGearsReal = Part1Solver.FindValidPartNumbersAndTheirSum(parsedRealInput);
+var productOfGearsReal = Part2Solver.FindGearsAndMultiplyThem(parsedRealInput);
 Console.WriteLine("The product of the part numbers for gears in the real schematic is " + productOfGearsReal);

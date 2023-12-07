@@ -51,7 +51,7 @@ public static class Initializer
                 {
                     var amountOfAdjacentNumbers = CountAdjacentNumbers(maxWidth, maxLength, j, parsedInputAsArray, i);
 
-                    if (amountOfAdjacentNumbers > 1) 
+                    if (amountOfAdjacentNumbers == 2) 
                     { 
                         gears[i, j] = true;
                         HandleEasyBorders(i, j, maxLength, maxWidth, validPositionsFromGears);
@@ -88,22 +88,22 @@ public static class Initializer
             amountOfAdjacentNumbers++;
         }
 
-        if (EastCondition(j, maxWidth2) && SouthCondition(i, maxLength2) && IsDigit(parsedInputAsArray[i + 1][j + 1]))
+        if (EastCondition(j, maxWidth2) && SouthCondition(i, maxLength2) && IsDigit(parsedInputAsArray[i + 1][j + 1])&& !IsDigit(parsedInputAsArray[i + 1][j]))
         {
             amountOfAdjacentNumbers++;
         }
 
-        if (EastCondition(j, maxWidth2) && NorthCondition(i) && IsDigit(parsedInputAsArray[i - 1][j + 1]))
+        if (EastCondition(j, maxWidth2) && NorthCondition(i) && IsDigit(parsedInputAsArray[i - 1][j + 1]) && !IsDigit(parsedInputAsArray[i - 1][j]))
         {
             amountOfAdjacentNumbers++;
         }
 
-        if (WestCondition(j) && SouthCondition(i, maxLength2) && IsDigit(parsedInputAsArray[i + 1][j - 1]))
+        if (WestCondition(j) && SouthCondition(i, maxLength2) && IsDigit(parsedInputAsArray[i + 1][j - 1]) && !IsDigit(parsedInputAsArray[i + 1][j]))
         {
             amountOfAdjacentNumbers++;
         }
 
-        if (WestCondition(j) && NorthCondition(i) && IsDigit(parsedInputAsArray[i - 1][j - 1]))
+        if (WestCondition(j) && NorthCondition(i) && IsDigit(parsedInputAsArray[i - 1][j - 1]) && !IsDigit(parsedInputAsArray[i - 1][j]))
         {
             amountOfAdjacentNumbers++;
         }
