@@ -8,4 +8,10 @@ public static class StringHelpers
         var nums = numsAsArrayOfStrings.Select(long.Parse);
         return nums.ToArray();
     }
+
+    public static string[] GetLinesFromFileInPath(string path)
+    {
+        var lines = File.ReadAllLines(path);
+        return lines;
+    }
 }
