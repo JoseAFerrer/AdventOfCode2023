@@ -21,11 +21,13 @@ public class AlmanacCalculator
         var numbers = GetNumbersFromOneString(seedsAsString);
         for (var i = 0; i < numbers.Length; i += 2)
         {
-            var top = numbers[i] + numbers[i + 1];
-            for (var j = numbers[i]; j < top; j++)
+            var seedRange = new SeedRange()
             {
-                Seeds.Add(j);
-            }
+                FirstSeed = numbers[i],
+                LastSeed = numbers[i] + numbers[i + 1],
+                Range = numbers[i + 1]
+            };
+            EncodedSeeds.Add(seedRange);
         }
     }
 
@@ -48,7 +50,7 @@ public class AlmanacCalculator
         HumidityMap = BuildDesiredXMap(temperatureHumidityIndex, humidityLocationIndex, Destination.Humidity);
         LocationMap = BuildDesiredXMap(humidityLocationIndex, lastIndex + 1, Destination.Location);
     }
-    public List<long> Seeds { get; set; } = new();
+    public List<SeedRange> EncodedSeeds { get; set; } = new();
     public XMap SoilMap { get; set; }
     public XMap FertilizerMap { get; set; }
     public XMap WaterMap { get; set; }
@@ -74,6 +76,21 @@ public class AlmanacCalculator
         var conclusion = ruleToApply.DestinationStart + difference;
         return conclusion;
     }
+    
+    private long GoBackGivenAMap(long inputNumber, Destination destination)
+    {
+        var myMap = AllMaps.First(x => x.Type == destination);
+        var exactRuleToApply = myMap.Rules.Find(x => x.DestinationStart == inputNumber);
+        var ruleToApply = exactRuleToApply ?? myMap.Rules.FindLast(x => x.DestinationStart < inputNumber && x.DestinationEnd > inputNumber);
+
+        if (ruleToApply is null)
+        {
+            return inputNumber;
+        }
+        var difference = inputNumber - ruleToApply.DestinationStart;
+        var conclusion = ruleToApply.SourceStart + difference;
+        return conclusion;
+    }
 
     public long FindLocationFromSeed(long seed)
     {
@@ -87,13 +104,56 @@ public class AlmanacCalculator
         Console.WriteLine(location);
         return location;
     }
-
-    public long FindClosestLocation()
-    {
-        var locations = Seeds.Select(FindLocationFromSeed);
-        return locations.Min();
-    }
     
+    public long FindSeedFromLocation(long location)
+    {
+        var humidity = GoBackGivenAMap(location, Destination.Location);
+        var temperature = GoBackGivenAMap(humidity, Destination.Humidity);
+        var light = GoBackGivenAMap(temperature, Destination.Temperature);
+        var water = GoBackGivenAMap(light, Destination.Light);
+        var fertilizer = GoBackGivenAMap(water, Destination.Water);
+        var soil = GoBackGivenAMap(fertilizer, Destination.Fertilizer);
+        var seed = GoBackGivenAMap(soil, Destination.Soil);
+        return seed;
+    }
+
+    private long FindClosestLocation(long top, long division)
+    {
+        for (long i = 0; i < top; i += division)
+        {
+            var seed = FindSeedFromLocation(i);
+            if (EncodedSeeds.Any(x => x.FirstSeed <= seed && seed <= x.LastSeed ))
+            {
+                return i;
+            }
+        }
+
+        return top;
+    }
+
+    public long FindClosestLocationComplex()
+    {
+        var maxSeedNr = EncodedSeeds.Max(x => x.LastSeed);
+        var top = maxSeedNr;
+        var division = (long)Math.Ceiling((double) top / 100000);
+        
+        long initialReturnable = top;
+        for (var i = 0; i < 10; i++)
+        {
+            top = FindClosestLocation(top, division);
+            Console.WriteLine("Current top: " + top);
+            if (division > 1)
+            {
+                division = (long)Math.Ceiling((double)division / 2);
+            }
+            else
+            {
+                return top;
+            }
+        }
+        
+        return top;
+    }
     
     
     private XMap BuildDesiredXMap(int startIndex, int endIndex, Destination destination)

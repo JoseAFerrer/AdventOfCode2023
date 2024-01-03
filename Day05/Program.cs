@@ -9,6 +9,6 @@ WorkOutSolution(pathToInput);
 void WorkOutSolution(string s)
 {
     var calculator = new AlmanacCalculator(s);
-    var closest = calculator.FindClosestLocation();
+    var closest = calculator.FindClosestLocationComplex();
     Console.WriteLine("The closest location is: " + closest);
 }
